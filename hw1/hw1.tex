@@ -1,0 +1,255 @@
+\documentclass[11pt]{article}
+% decent example of doing mathematics and proofs in LaTeX.
+% An Incredible degree of information can be found at
+% http://en.wikibooks.org/wiki/LaTeX/Mathematics
+
+% Use wide margins, but not quite so wide as fullpage.sty
+\marginparwidth 0.5in
+\oddsidemargin 0.25in
+\evensidemargin 0.25in
+\marginparsep 0.25in
+\topmargin 0.25in
+\textwidth 6in \textheight 8 in
+% That's about enough definitions
+
+\usepackage{amsmath}
+\usepackage{upgreek}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amscd}
+\usepackage{mathtools}
+\usepackage{enumerate}
+\usepackage{verbatim}
+
+% My custom math definitions
+\newtheorem*{claim}{Claim}
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{exrc}[thm]{Exercise}
+\theoremstyle{definition}
+\newtheorem{exmp}[thm]{Example}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{remk}[thm]{Remark}
+\newcommand{\bbsym}[2]{\newcommand{#1}{\mathbb{#2}}}
+\newcommand{\acts}{\curvearrowright}
+\bbsym{\Z}{Z}
+\bbsym{\N}{N}
+\bbsym{\C}{C}
+\bbsym{\R}{R}
+\bbsym{\F}{F}
+\bbsym{\Q}{Q}
+\bbsym{\A}{A}
+\bbsym{\p}{P}
+\newcommand{\normal}{\mathrel{\lhd}}
+\newcommand{\ang}[1]{\left( #1 \right )}
+\newcommand{\mtrx}[1]{\left(\begin{matrix} #1 \end{matrix}\right)}
+\newcommand{\pdrv}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\app}[2]{{#1}\left(#2\right)}
+\newcommand{\s}[1]{\mathcal{#1}}
+\newcommand{\Set}{{\textsc{Set}}}
+\newcommand{\Grp}{{\textsc{Grp}}}
+\newcommand{\id}{\text{id}}
+\newcommand{\Id}{\text{Id}}
+
+\makeatletter
+\newcommand{\xdashrightarrow}[2][]{\ext@arrow 0359\rightarrowfill@@{#1}{#2}}
+\newcommand{\xdashleftarrow}[2][]{\ext@arrow 3095\leftarrowfill@@{#1}{#2}}
+\newcommand{\xdashleftrightarrow}[2][]{\ext@arrow 3359\leftrightarrowfill@@{#1}{#2}}
+\def\rightarrowfill@@{\arrowfill@@\relax\relbar\rightarrow}
+\def\leftarrowfill@@{\arrowfill@@\leftarrow\relbar\relax}
+\def\leftrightarrowfill@@{\arrowfill@@\leftarrow\relbar\rightarrow}
+\def\arrowfill@@#1#2#3#4{%
+  $\m@th\thickmuskip0mu\medmuskip\thickmuskip\thinmuskip\thickmuskip
+   \relax#4#1
+   \xleaders\hbox{$#4#2$}\hfill
+   #3$%
+}
+\makeatother
+
+\makeatletter
+\let\save@mathaccent\mathaccent
+\newcommand*\if@single[3]{%
+  \setbox0\hbox{${\mathaccent"0362{#1}}^H$}%
+  \setbox2\hbox{${\mathaccent"0362{\kern0pt#1}}^H$}%
+  \ifdim\ht0=\ht2 #3\else #2\fi
+  }
+%The bar will be moved to the right by a half of \macc@kerna, which is computed by amsmath:
+\newcommand*\rel@kern[1]{\kern#1\dimexpr\macc@kerna}
+%If there's a superscript following the bar, then no negative kern may follow the bar;
+%an additional {} makes sure that the superscript is high enough in this case:
+\newcommand*\widebar[1]{\@ifnextchar^{{\wide@bar{#1}{0}}}{\wide@bar{#1}{1}}}
+%Use a separate algorithm for single symbols:
+\newcommand*\wide@bar[2]{\if@single{#1}{\wide@bar@{#1}{#2}{1}}{\wide@bar@{#1}{#2}{2}}}
+\newcommand*\wide@bar@[3]{%
+  \begingroup
+  \def\mathaccent##1##2{%
+%Enable nesting of accents:
+    \let\mathaccent\save@mathaccent
+%If there's more than a single symbol, use the first character instead (see below):
+    \if#32 \let\macc@nucleus\first@char \fi
+%Determine the italic correction:
+    \setbox\z@\hbox{$\macc@style{\macc@nucleus}_{}$}%
+    \setbox\tw@\hbox{$\macc@style{\macc@nucleus}{}_{}$}%
+    \dimen@\wd\tw@
+    \advance\dimen@-\wd\z@
+%Now \dimen@ is the italic correction of the symbol.
+    \divide\dimen@ 3
+    \@tempdima\wd\tw@
+    \advance\@tempdima-\s{C}riptspace
+%Now \@tempdima is the width of the symbol.
+    \divide\@tempdima 10
+    \advance\dimen@-\@tempdima
+%Now \dimen@ = (italic correction / 3) - (Breite / 10)
+    \ifdim\dimen@>\z@ \dimen@0pt\fi
+%The bar will be shortened in the case \dimen@<0 !
+    \rel@kern{0.6}\kern-\dimen@
+    \if#31
+      \overline{\rel@kern{-0.6}\kern\dimen@\macc@nucleus\rel@kern{0.4}\kern\dimen@}%
+      \advance\dimen@0.4\dimexpr\macc@kerna
+%Place the combined final kern (-\dimen@) if it is >0 or if a superscript follows:
+      \let\final@kern#2%
+      \ifdim\dimen@<\z@ \let\final@kern1\fi
+      \if\final@kern1 \kern-\dimen@\fi
+    \else
+      \overline{\rel@kern{-0.6}\kern\dimen@#1}%
+    \fi
+  }%
+  \macc@depth\@ne
+  \let\math@bgroup\@empty \let\math@egroup\macc@set@skewchar
+  \mathsurround\z@ \frozen@everymath{\mathgroup\macc@group\relax}%
+  \macc@set@skewchar\relax
+  \let\mathaccentV\macc@nested@a
+%The following initialises \macc@kerna and calls \mathaccent:
+  \if#31
+    \macc@nested@a\relax111{#1}%
+  \else
+%If the argument consists of more than one symbol, and if the first token is
+%a letter, use that letter for the computations:
+    \def\gobble@till@marker##1\endmarker{}%
+    \futurelet\first@char\gobble@till@marker#1\endmarker
+    \ifcat\noexpand\first@char A\else
+      \def\first@char{}%
+    \fi
+    \macc@nested@a\relax111{\first@char}%
+  \fi
+  \endgroup
+}
+\makeatother
+
+\begin{document}
+\author{Sebastian Conybeare}
+\title{Yoneda Lemma Notes}
+\maketitle
+
+\section{Warm-Up: Cayley's Theorem}
+Before talking about the Yoneda Lemma, we have to talk about Cayley's Theorem, which we can't do without talking about groups.
+
+\begin{defn}
+    A group $(G,\cdot,e)$ consists of a set $G$, together with a binary operation $\cdot : G \times G \to G$ and an element $e \in G$ satisfying the following properties:
+    \begin{itemize}
+        \item
+            For all $x,y,z \in G$, $x(yz) = (xy)z$.
+        \item
+            For all $x \in G$, $ex = xe = x$.
+        \item
+            For each $x \in G$, there exists $y \in G$ so that $xy = yx = e$.
+    \end{itemize}
+\end{defn}
+when the operation is clear from context, we refer to $(G,\cdot,e)$ as simply $G$.
+
+\begin{exmp}
+    The group $GL(n)$ of invertible $n \times n$ matrices is a group under matrix multiplication.
+\end{exmp}
+
+\begin{exmp}
+    $GL(n)$ has a subgroup $SO(n)$ which consists of those matrices which also have determinant $1$.
+\end{exmp}
+
+\begin{exmp}
+    For any set $X$, the set $S(X)$ of bijections $X \to X$ is a group under composition.
+\end{exmp}
+
+\begin{exmp}
+    The \textbf{free group on two generators}, $F_2$, is the set of reduced strings over the alphabet $\{a,a^{-1},b,b^{-1}\}$, where a string $w$ is \textbf{reduced} if no two adjacent symbols of $w$ are inverses. The group operation is given by concatenation, followed by iterated removal of forbidden substrings.
+\end{exmp}
+
+\begin{exrc}
+    Prove that each of the above examples satisfies the group axioms.
+\end{exrc}
+
+Before continuing, we define morphisms of groups:
+
+\begin{defn}
+    Let $G$ and $H$ be groups. A function $\phi : G \to H$ is a homomorphism if $\phi(x)\phi(y) = \phi(xy)$ for all $x,y \in G$.
+\end{defn}
+
+\begin{exrc}
+    Let $\Grp$ be the class of all groups. Prove that taking $\Grp(G,H)$ to be the set of homomorphisms from $G$ to $H$ defines a category with composition given by function composition, which we will call the category of groups. Prove that a morphism $\phi : G \to H$ is an isomorphism iff the underlying function of sets is a bijection. \textbf{(Hint: show that the function $\phi^{-1}$ is a homomorphism.)}
+\end{exrc}
+
+Some of the example groups are given as a set of symmetries, in a sense made precise by the following definition:
+
+\begin{defn}
+    A symmetry group $P$ is a group which is isomorphic to a subgroup of $S(X)$ for some set $X$.
+\end{defn}
+
+Examples 1.2-1.4 are obviously symmetry groups, but it's less obvious whether or not Example 1.5 is. For that question, we have Cayley's Theorem.
+
+\begin{thm}[Cayley's Theorem]
+    Let $G$ be a group. Then $G$ is isomorphic to a subgroup of $S(G)$. In particular, $G$ is a symmetry group.
+\end{thm}
+\begin{proof}
+    Let $H = \{f \in S(G) \mid \exists g \in G \, . \, \forall x \in G \,.\, f(x) = gx\}$. We define $\phi : G \to H$ by $\phi(g)(x) = gx$. $\phi$ is obviously surjective, and is injective since $\phi(g)(e) = ge = g$ for all $g \in G$. Finally, $\phi$ is an isomorphism, since if $g,g' \in G$, then $(\phi(g) \circ \phi(g'))(x) = \phi(g)(g'x) = gg'x = \phi(gg')(x)$, and in particular, $\phi(gg') = \phi(g) \circ \phi(g')$.
+\end{proof}
+
+The upshot here is that every group, even $F_2$, is a symmetry group of \textbf{something}. The most noticeable consequence of Cayley's Theorem is that group theorists don't bother to distinguish symmetry groups from general groups; they just call them all, well, groups!
+
+\section{The Yoneda Lemma: Categorical Preliminaries}
+\begin{defn}
+    Let $\s{C}$ and $\s D$ be categories, and let $F : \s{C} \to \s D$ be a functor. We say that $F$ is \textbf{full} if the induced function $f^* : \s{C}(X,Y) \to \s D(FX,FY)$ is always surjective, and we call $F$ \textbf{faithful} if $f^*$ is always injective. If $F$ is both full and faithful, we say that $F$ is \textbf{fully faithful}.
+\end{defn}
+
+\begin{defn}
+    A \textbf{full subcategory} $\s{C}'$ of a category $\s{C}$ is a subcategory such that the inclusion $i : \s{C}' \hookrightarrow \s{C}$ is a full functor.
+\end{defn}
+
+\begin{exrc}
+    Prove that the inclusion of a subcategory is always a faithful functor.
+\end{exrc}
+
+\begin{defn}
+    Let $\s{C}$ and $\s D$ be categories. A functor $F : \s{C} \to \s D$ is \textbf{essentially surjective} if it is surjective on isomorphism classes of objects. Explicitly, $F$ is essentially surjective if for every object $Y \in \s D$, there exists an isomorphism $\phi : F(X) \xrightarrow{\sim} Y$ for some object $X \in \s{C}$. We say that $F$ is a \textbf{weak equivalence of categories}, or just an equivalence if $F$ is fully faithful and essentially surjective.
+\end{defn}
+
+\begin{exrc}
+    Let $F : \s{C} \to \s D$ be a fully faithful functor. Prove that there is a full subcategory $\s{D}' \subseteq \s{D}$ and an equivalence $\widetilde{F} : \s{C} \to \s D'$ so that $F \cong i \circ \widetilde{F}$, where $i : \s D' \to \s D$ is the inclusion functor.
+\end{exrc}
+
+Consider a full subcategory $\s{C}$ of $\Set$ which contains the terminal object $1 = \{*\}$. The functor $h^1 = \s{C}(1,-) : \Set \to \Set$ is then naturally isomorphic to the inclusion functior $i : \s{C} \hookrightarrow \Set$, by the transformation $\alpha : h^1 \Rightarrow i$ given by $\alpha_X(f) = f(*)$.
+
+\begin{exrc}
+    Suppose that $\s{C}'$ is a full subcategory of $\s{C}$, and that the terminal object $1 \in \s{C}$ is also in $\s{C}'$. Prove that $1$ is a terminal object of $\s{C}'$.
+\end{exrc}
+
+Now let's stop and think about how nice this situations is. Suppose I give you a category $\s{D}$, and I tell you that $\s{D}$ is equivalent to a full subcategory $\s{C}$ of $\Set$ which contains the terminal object, but I don't tell you which subcategory it is, or what the inclusion functor is. Then you can recover the inclusion functor up to a unique natural isomorphism by taking the hom-functor $h^1$, where $1$ is the terminal object of $\s{D}$. In particular, given an object $X \in \s{D}$, you can figure out which set $X$ is!
+Given an arbitrary category $\s{C}$, even if there is a terminal object $1 \in \s{C}$, we've no right to expect that $\s{C}$ be equivalent to a full subcategory of $\Set$.
+
+\begin{exrc}
+    Let $\s{FD}$ be the small category whose set of objects $\{\R^n \mid 0 \le n\}$ consists of one vector space of each finite dimension, and whose morphisms $\R^n \to \R^m$ are given by linear transformations, composed normally. Prove that $\R^0$ is a terminal object, and that $h_{\R^0} : \s{FD} \to \Set$ is not faithful. Conclude that $\s{FD}$ is not equivalent to any full subcategory of $\Set$ which contains the terminal object of $\Set$.
+\end{exrc}
+
+\begin{exrc}
+    Suppose that $i : \s{C} \to \Set$ is fully faithful, and that $X$ and $Y$ are objects of $\s{C}$ with two distinct morphisms $f \neq g : X \to Y$. Prove that any terminal object $\s{C}$ must be mapped to a terminal object of $\Set$ under $i$. Conclude that $\s{FD}$ is not equivalent to a full subcategory of $\Set$.
+\end{exrc}
+
+Let $\s{C}$ be a locally small category. Then for each object $A \in \s{C}$, there is a representable contravariant functor $h_A = \s{C}(-,A) : \s{C}^{op} \to \Set$. $h_A$ acts on morphisms by sending each arrow $g : X \to Y$ to the function $h_A(g) = (- \circ g) : \s{C}(Y,A) \to \s{C}(X,A)$. Now suppose that $f : A \to B$ is a morphism in $\s{C}$. Then $f$ induces a natural transformation $h_f : h_A \Rightarrow h_B$. For each object $X \in \s{C}$, $(h_f)_X : \s{C}(X,A) \to \s{C}(X,B)$ is defined by $(h_f)_X(t) = f \circ t$. Checking naturality amounts to checking that for any $g : X \to Y$, the diagram commutes:
+\[
+    \begin{CD}
+        \s{C}(Y,A) @>h_A(g) = (-\circ g)>> \s{C}(X,A) \\
+        @V(h_f)_Y=(f\circ-)VV @VV(h_f)_X = (f\circ-)V \\
+        \s{C}(Y,B) @>>h_B(g) = (-\circ g)> \s{C}(X,B)
+    \end{CD}
+\]
+or in other words, that for each $h \in \s{C}(Y,A)$, $(f \circ h) \circ g = f \circ (h \circ g)$.
+
+\end{document}
