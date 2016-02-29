@@ -20,16 +20,23 @@
 \usepackage{mathtools}
 \usepackage{enumerate}
 \usepackage{verbatim}
+\usepackage{theoremref}
+\usepackage{tikz-cd}
+\usepackage{fancyref}
 
 % My custom math definitions
 \newtheorem*{claim}{Claim}
+
 \theoremstyle{plain}
-\newtheorem{thm}{Theorem}[section]
+\newtheorem{thm}{Theorem}[subsection]
 \newtheorem{exrc}[thm]{Exercise}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{prop}[thm]{Proposition}
 \theoremstyle{definition}
 \newtheorem{exmp}[thm]{Example}
 \newtheorem{defn}[thm]{Definition}
 \newtheorem{remk}[thm]{Remark}
+
 \newcommand{\bbsym}[2]{\newcommand{#1}{\mathbb{#2}}}
 \newcommand{\acts}{\curvearrowright}
 \bbsym{\Z}{Z}
@@ -40,6 +47,8 @@
 \bbsym{\Q}{Q}
 \bbsym{\A}{A}
 \bbsym{\p}{P}
+
+
 \newcommand{\normal}{\mathrel{\lhd}}
 \newcommand{\ang}[1]{\left( #1 \right )}
 \newcommand{\mtrx}[1]{\left(\begin{matrix} #1 \end{matrix}\right)}
@@ -48,8 +57,16 @@
 \newcommand{\s}[1]{\mathcal{#1}}
 \newcommand{\Set}{{\textsc{Set}}}
 \newcommand{\Grp}{{\textsc{Grp}}}
-\newcommand{\id}{\text{id}}
-\newcommand{\Id}{\text{Id}}
+\newcommand{\mathtext}[1]{{\normalfont \text{#1}}}
+\newcommand{\newmtext}[2]{\newcommand{#1}{\mathtext{#2}}}
+\newmtext{\id}{id}
+\newmtext{\Id}{Id}
+\newmtext{\psh}{PSh}
+\newmtext{\copsh}{coPSh}
+\newmtext{\nat}{Nat}
+\newmtext{\fun}{Fun}
+\newmtext{\pt}{pt}
+\newmtext{\ev}{ev}
 
 \makeatletter
 \newcommand{\xdashrightarrow}[2][]{\ext@arrow 0359\rightarrowfill@@{#1}{#2}}
@@ -144,6 +161,8 @@
 \section{Warm-Up: Cayley's Theorem}
 Before talking about the Yoneda Lemma, we have to talk about Cayley's Theorem, which we can't do without talking about groups.
 
+\subsection{Groups}
+
 \begin{defn}
     A group $(G,\cdot,e)$ consists of a set $G$, together with a binary operation $\cdot : G \times G \to G$ and an element $e \in G$ satisfying the following properties:
     \begin{itemize}
@@ -169,7 +188,7 @@ when the operation is clear from context, we refer to $(G,\cdot,e)$ as simply $G
     For any set $X$, the set $S(X)$ of bijections $X \to X$ is a group under composition.
 \end{exmp}
 
-\begin{exmp}
+\begin{exmp}\thlabel{freegroup2}
     The \textbf{free group on two generators}, $F_2$, is the set of reduced strings over the alphabet $\{a,a^{-1},b,b^{-1}\}$, where a string $w$ is \textbf{reduced} if no two adjacent symbols of $w$ are inverses. The group operation is given by concatenation, followed by iterated removal of forbidden substrings.
 \end{exmp}
 
@@ -177,7 +196,7 @@ when the operation is clear from context, we refer to $(G,\cdot,e)$ as simply $G
     Prove that each of the above examples satisfies the group axioms.
 \end{exrc}
 
-Before continuing, we define morphisms of groups:
+\subsection{The Category of Groups}
 
 \begin{defn}
     Let $G$ and $H$ be groups. A function $\phi : G \to H$ is a homomorphism if $\phi(x)\phi(y) = \phi(xy)$ for all $x,y \in G$.
@@ -187,16 +206,21 @@ Before continuing, we define morphisms of groups:
     Let $\Grp$ be the class of all groups. Prove that taking $\Grp(G,H)$ to be the set of homomorphisms from $G$ to $H$ defines a category with composition given by function composition, which we will call the category of groups. Prove that a morphism $\phi : G \to H$ is an isomorphism iff the underlying function of sets is a bijection. \textbf{(Hint: show that the function $\phi^{-1}$ is a homomorphism.)}
 \end{exrc}
 
-Some of the example groups are given as a set of symmetries, in a sense made precise by the following definition:
+\subsection{Cayley's Theorem}
+
+Most of the examples were given as a set of symmetries, in a sense made precise by the following definition:
 
 \begin{defn}
-    A symmetry group $P$ is a group which is isomorphic to a subgroup of $S(X)$ for some set $X$.
+    A permutation group $P$ is a group which is isomorphic to a subgroup of $S(X)$ for some set $X$.
 \end{defn}
 
-Examples 1.2-1.4 are obviously symmetry groups, but it's less obvious whether or not Example 1.5 is. For that question, we have Cayley's Theorem.
+
+\begin{remk}
+    The examples of groups that we discussed were mostly of the form ``the set of bijections $X \to X$ which satisfy property $P$,'' and so are permutation groups. However, \thref{freegroup2} may appear to buck this trend; it is not immediately obvious that $F_2$ is a permutation group.
+\end{remk}
 
 \begin{thm}[Cayley's Theorem]
-    Let $G$ be a group. Then $G$ is isomorphic to a subgroup of $S(G)$. In particular, $G$ is a symmetry group.
+    Let $G$ be a group. Then $G$ is isomorphic to a subgroup of $S(G)$. In particular, $G$ is a permutation group.
 \end{thm}
 \begin{proof}
     Let $H = \{f \in S(G) \mid \exists g \in G \, . \, \forall x \in G \,.\, f(x) = gx\}$. We define $\phi : G \to H$ by $\phi(g)(x) = gx$. $\phi$ is obviously surjective, and is injective since $\phi(g)(e) = ge = g$ for all $g \in G$. Finally, $\phi$ is an isomorphism, since if $g,g' \in G$, then $(\phi(g) \circ \phi(g'))(x) = \phi(g)(g'x) = gg'x = \phi(gg')(x)$, and in particular, $\phi(gg') = \phi(g) \circ \phi(g')$.
@@ -204,9 +228,10 @@ Examples 1.2-1.4 are obviously symmetry groups, but it's less obvious whether or
 
 The upshot here is that every group, even $F_2$, is a symmetry group of \textbf{something}. The most noticeable consequence of Cayley's Theorem is that group theorists don't bother to distinguish symmetry groups from general groups; they just call them all, well, groups!
 
-\section{The Yoneda Lemma: Categorical Preliminaries}
+\section{The Yoneda Lemma}
+\subsection{Functors and Equivalences}
 \begin{defn}
-    Let $\s{C}$ and $\s D$ be categories, and let $F : \s{C} \to \s D$ be a functor. We say that $F$ is \textbf{full} if the induced function $f^* : \s{C}(X,Y) \to \s D(FX,FY)$ is always surjective, and we call $F$ \textbf{faithful} if $f^*$ is always injective. If $F$ is both full and faithful, we say that $F$ is \textbf{fully faithful}.
+    Let $\s{C}$ and $\s D$ be categories, and let $F : \s{C} \to \s D$ be a functor. We say that $F$ is \textbf{full} if the induced function $f^* : \s{C}(X,Y) \to \s D(FX,FY)$ is always surjective, and we call $F$ \textbf{faithful} if $f^*$ is always injective. If $F$ is both full and faithful, we say that $F$ is \textbf{fully faithful}, or a \textbf{fully faithful embedding} when we want to think of $\s C$ as a subcategory of $\s D$.
 \end{defn}
 
 \begin{defn}
@@ -235,12 +260,22 @@ Now let's stop and think about how nice this situations is. Suppose I give you a
 Given an arbitrary category $\s{C}$, even if there is a terminal object $1 \in \s{C}$, we've no right to expect that $\s{C}$ be equivalent to a full subcategory of $\Set$.
 
 \begin{exrc}
-    Let $\s{FD}$ be the small category whose set of objects $\{\R^n \mid 0 \le n\}$ consists of one vector space of each finite dimension, and whose morphisms $\R^n \to \R^m$ are given by linear transformations, composed normally. Prove that $\R^0$ is a terminal object, and that $h_{\R^0} : \s{FD} \to \Set$ is not faithful. Conclude that $\s{FD}$ is not equivalent to any full subcategory of $\Set$ which contains the terminal object of $\Set$.
+    Let $\s{FD}$ be the small category whose set of objects $\{\R^n \mid 0 \le n\}$ consists of one vector space of each finite dimension, and whose morphisms $\R^n \to \R^m$ are given by linear transformations, composed normally. Prove that $1 = \R^0$ is a terminal object, and that $h^1 : \s{FD} \to \Set$ is not faithful. Conclude that $\s{FD}$ is not equivalent to any full subcategory of $\Set$ which contains the terminal object of $\Set$.
 \end{exrc}
 
 \begin{exrc}
     Suppose that $i : \s{C} \to \Set$ is fully faithful, and that $X$ and $Y$ are objects of $\s{C}$ with two distinct morphisms $f \neq g : X \to Y$. Prove that any terminal object $\s{C}$ must be mapped to a terminal object of $\Set$ under $i$. Conclude that $\s{FD}$ is not equivalent to a full subcategory of $\Set$.
 \end{exrc}
+
+\begin{exrc}\thlabel{fullfaithfuliso}
+    Let $F : \s C \to \s D$ be a fully faithful functor, and let $F(g) \in \s D(F(A), F(B))$ be an isomorphism. Prove that $g$ is an isomorphism.
+\end{exrc}
+
+\begin{exrc}\thlabel{natbij}
+    Let $\s C$ and $\s D$ be categories, let $F, G : \s C \to \s D$ be functors, and $\alpha : F \Rightarrow G$ a natural transformation. Further suppose that $\alpha_X$ is an isomorphism for each $X \in \s C$. Prove that $\alpha$ is an isomorphism in the category $[\s C, \s D]$ of functors from $\s C$ to $\s D$. (\textbf{Hint: Once you figure out what you're trying to prove, the answer is immediate})
+\end{exrc}
+
+\subsection{Presheaves}
 
 Let $\s{C}$ be a locally small category. Then for each object $A \in \s{C}$, there is a representable contravariant functor $h_A = \s{C}(-,A) : \s{C}^{op} \to \Set$. $h_A$ acts on morphisms by sending each arrow $g : X \to Y$ to the function $h_A(g) = (- \circ g) : \s{C}(Y,A) \to \s{C}(X,A)$. Now suppose that $f : A \to B$ is a morphism in $\s{C}$. Then $f$ induces a natural transformation $h_f : h_A \Rightarrow h_B$. For each object $X \in \s{C}$, $(h_f)_X : \s{C}(X,A) \to \s{C}(X,B)$ is defined by $(h_f)_X(t) = f \circ t$. Checking naturality amounts to checking that for any $g : X \to Y$, the diagram commutes:
 \[
@@ -250,6 +285,223 @@ Let $\s{C}$ be a locally small category. Then for each object $A \in \s{C}$, the
         \s{C}(Y,B) @>>h_B(g) = (-\circ g)> \s{C}(X,B)
     \end{CD}
 \]
-or in other words, that for each $h \in \s{C}(Y,A)$, $(f \circ h) \circ g = f \circ (h \circ g)$.
+or in other words, that for each map $m \in \s{C}(Y,A)$, $(f \circ m) \circ g = f \circ (m \circ g)$. Furthermore, given $f : A \to B$ and $g : B \to C$, $h_g \circ f = h_{g \circ f}$, since precomposing a map with $f \circ g$ is the same as precomposing it with $g$ and then precomposing the result with $f$. Finally, $h_{\Id} = \Id$, since composing with the identity gives you back what you started with.
+
+\begin{defn}
+    Let $\s C$ be a category. A \textbf{presheaf} on $\s C$ is a contravariant functor from $\s C$ to $\Set$. If $F$ and $G$ are presheaves on $\s C$, a morphism $F \to G$ of presheaves is a natural transformation. We denote the category of presheaves on $\s C$ as $\psh(\s C)$.
+\end{defn}
+
+\begin{remk}
+    The previous discussion amounts to $h_{(-)}$ being a (covariant) functor from $\s C$ to the category $\psh(\s C)$ of \textbf{presheaves} on $\s C$.
+\end{remk}
+
+\subsection{The Yoneda Lemma}
+
+\begin{thm}[The Yoneda Lemma]\thlabel{yonedalemma}
+    Let $F$ be a presheaf on $\s C$. Then there is bijection $\psh(\s C)(h_X, F) \cong F(X)$ which is natural in $X$.
+\end{thm}
+
+\begin{exrc}[The Yoneda Embedding]\thlabel{yonedaembedding}
+    Assume the Yoneda lemma, and prove that the functor $h_{(-)} : \s C \to \psh(\s C)$ is a fully faithful embedding.
+\end{exrc}
+
+\begin{remk}\thlabel{yonedacurry}
+    In light of \thref{yonedaembedding}, we can now justify the choice to define $\psh(\s C)$ as the category of \textit{contravariant} functors from $\s C$ to $\Set$. We really care about the Yoneda embedding $h_{(-)}$, which allows us to freely interchange between objects of $X \in \s C$ and representable presheaves $h_X \in \psh(\s C)$. Indeed, we began with a bifunctor $\s C(-,-) : \s C^{op} \times \s C \to \Set$. We can give an alternate description of $h_{(-)}$ as the currying of $\s C(-,-)$ into the form $\s C \to \fun(\s C^{op}, \Set)$.
+\end{remk}
+
+\begin{exrc}\thlabel{yonedaop}
+    Let $\s C$ be a category, and define $\copsh(\s C)$ as the category of \textbf{covariant} functors $\s C \to \Set$. Assuming \thref{yonedaembedding}, show that there is a fully faithful embedding $h^{(-)} : \s C^{op} \to \copsh(\s C)$. Then, assuming the Yoneda lemma, prove that for any copresheaf $F \in \copsh(\s C)$, there is a bijection $\copsh(\s C)(h^X, F) \cong F(X)$ which is natural in $X$.
+\end{exrc}
+
+\begin{cor}\thlabel{yonedaiso}
+    Suppose that $A,B \in \s C$, and that $\alpha : h_A \Rightarrow h_B$ is a natural isomorphism. Then there is a unique isomorphism $\widetilde{\alpha} : A \to B$ so that $h_{\widetilde{\alpha}} = \alpha$.
+\end{cor}
+\begin{proof}
+    The result follows immediately from the Yoneda lemma and \thref{fullfaithfuliso}
+\end{proof}
+
+\begin{exrc}\thlabel{yonedasep}
+    Prove that the collection of representables is a separating family of $\psh(\s C)$
+\end{exrc}
+
+\begin{exmp}\thlabel{yonedagraphex}
+    Let $\s C = \{V \rightrightarrows E\}$ be the category with two distinct non-identity morphisms $s,t : V \to E$. Then a presheaf $F \in \psh(\s C)$ amounts to sets $F(E), F(V)$ with source and target maps $s, t : F(E) \to F(V)$, or in other words, a directed reflexive multigraph.
+    A graph homomorphism $\phi : F \to G$ is consists of maps $\phi_E : F(E) \to G(E)$ and $\phi_V : F(V) \to G(V)$ which commutes with the source and target maps.
+    The representable presheaf $h_V$ consists of a single vertex $\Id_V$ and no edges, and its source and target maps are thus trivial.
+    The representable $h_E$ consists of a single edge $\Id_E$ and two distinct vertices $s, t \in h_E(V) = \s C(V,E)$. In other words, $h_V$ is the graph with one vertex, and $h_E$ is the graph with a single edge and distinct endpoints.
+    
+    Let $G \in \psh(\s C)$ be a graph. We will try to understand the maps from representables into $G$.
+    A graph homomorphism from $h_V$ to $G$ amounts to a mapping of vertices and edges which preserves source and target relations. If the Yoneda lemma is true, we should expect these to correspond to vertices of $G$.
+    Indeed, there are no edges in $h_V$, and thus no source or target relations to preserve, so everything comes free besides the map of vertices.
+    There's only one vertex in $V$, so that map is just given by an element of $G(V)$, as expected.
+    
+    Now we direct our attention toward morphisms $\alpha : h_E \to G$. Such a morphism is determined by maps
+    \begin{align*}
+        \alpha_E &: h_E(E) \to G(E) \\
+        \alpha_V &: h_E(V) \to G(V)
+    \end{align*}
+    and must satisfy
+    \begin{align*}
+        \alpha_E(s(e)) &= s(\alpha_E(e)) \\
+        \alpha_E(t(e)) &= t(\alpha_E(e))
+    \end{align*}
+    for each edge $e \in h_E(E)$. But $h_E$ only has one edge, so our choice of morphism is reduced to picking an edge $e' \in G(E)$, along with the function $\alpha_V : h_E(V) = \{s,t\} \to G(V)$. But the constraints above can then be rewritten as
+    \begin{align*}
+        \alpha_E(s) &= s(e') \\
+        \alpha_E(t) &= t(e')
+    \end{align*}
+    which looks an awful lot like a \textit{definition} of $\alpha_V$. Thus, the natural transformations from $h_E$ to $G$ are in bijection with $G(E)$.
+\end{exmp}
+
+\subsection{Limits, Revisited}
+
+We will defer the proof of the Yoneda lemma to \fref{sec:yonedaproof}. First, we will attempt to understand limits in a locally small category $\s C$ via presheaves on $\s C$.
+
+Let $D$ be a small category. We define $\pt : D^{op} \to \Set$ as the functor which sends every object of $D$ to $1 = \{*\}$, and every morphism to the unique function $1 \to 1$.
+
+\begin{exrc}
+    Prove that $\pt$ is the terminal object of $\psh(\s C)$.
+\end{exrc}
+
+\begin{thm}\thlabel{presheaflimit}
+    Let $J$ be a small category, and $D \in \psh(J)$ a $J^{op}$-shaped diagram of sets. Then the limit $\lim D$ can be identified with the set $\psh(J)(\pt, D)$ of natural transformations from $\pt$ to $D$.
+\end{thm}
+
+\begin{proof}
+    Recall that the limit of $D$ can be identified with the subset of $\prod_{j \in J} F(j)$ given by
+    \begin{equation*}
+        \lim D =
+            \left\{
+                (x_j)_{j \in J} \in \prod_{j \in J} D(j)\;
+            \middle|
+                \;\forall j, j' \in J, g \in J(j,j'),\; D(j)(x_{j'}) = x_j
+            \right\}
+    \end{equation*}
+    which is a set since $J$ is small. On the other hand, natural transformations from $\pt$ to $D$ are given by those indexed collections
+    \begin{equation*}
+        (\eta_j)_{j \in J} \in \prod_{j \in J} \{\pt(j) \to D(j)\} \cong \prod_{j \in J} D(j)
+    \end{equation*}
+    which satisfy
+    \begin{equation*}
+        \eta_j \circ \pt(g) = D(g) \circ \eta_{j'}
+    \end{equation*}
+    for all $j,j' \in J$, $g \in J(j,j')$. But that's exactly what we wrote for $\lim D$.
+\end{proof}
+
+\begin{comment}
+\begin{exrc}
+    Let $D = \{A, B\}$ be the category with two objects and only identity morphisms.
+    Let $X$ and $Y$ be sets, and define a contravariant functor $F : D^{op} \to \Set$ which sends $A$ to $X$ and $B$ to $Y$.
+    Describe an interpretation of natural transformations $\pt \Rightarrow F$ as pairs $(x,y) \in X \times Y$. Generalize your interpretation to the case where $D$ consists of an arbitrary set of objects and only identity morphisms.
+\end{exrc}
+\end{comment}
+
+\begin{remk}
+    In light of this theorem, we can plainly see that the operation which sends a presheaf on $D$ to its limit is just the functor $h^\pt : \psh(D) \to \Set$. In particular, $D \mapsto \lim D$ can naturally be made into a covariant functor.
+\end{remk}
+
+\begin{exrc}[Limits of Diagrams are Pointwise] \thlabel{diagramlimitpointwise}
+    \cite[Proposition 8.8]{awodey}
+    Let $\s C$ and $\s D$ be (possibly large) categories. If $D$ is complete, then so is the functor category $[\s C,\s D]$, and for every object $X \in \s C$, the evaluation functor $\ev_X : [\s C, \s D] \to \s D$ is continuous.
+\end{exrc}
+
+\begin{defn}
+    Let $\s C$ be a locally small category, $J$ a small category, and $D : J^{op} \to \s C$ a $J^{op}$-shaped diagram in $\s C$. We define the \textbf{presheaf-valued limit}, $\widehat{\lim}D$ as the limit of the diagram $h_{D(-)} : J^{op} \to \psh(\s C)$.
+\end{defn}
+
+\begin{remk}
+    The definition of $\widehat{\lim}D$ is such that morphisms from $h_X$ to $D$, which are the same as elements of $D(X)$, are just cones from $X$ to $D$. In other words, if $D$ really does have a limit $L$, then morphisms from $h_X$ to $F$ are just cones from $X$ to $F$, which are themselves just morphisms from $X$ to $L$
+\end{remk}
+
+\begin{defn}[Improved Definition of Limits]
+\thlabel{betterlimitdef}
+    Let $\s C$ be a locally small category, and let $D : J \to \s C$. We then define a limit of $D$ as an object $L \in \s C$, together with an isomorphism $h_L \cong \widehat{\lim}D$. In other words, the limit of $D$ is the representing object of $\widehat{\lim} D$.
+\end{defn}
+
+\begin{exrc}\thlabel{betterlimitislimit}\thlabel{yonedacontinuous}
+    Prove that \thref{betterlimitdef} is equivalent to the standard definition. Conclode that the Yoneda embedding is continuous functor.
+\end{exrc}
+
+\begin{remk}
+    Remember that our goal was to understand limits in an arbitrary (locally small) category $\s C$. Unfortunately, a category $\s C$ need not have small limits. However, by \thref{diagramlimitpointwise}, that $\psh(\s C)$ has all limits. Furthermore, by \thref{yonedacontinuous}, if $D : J^{op} \to \s C$ happens to have a limit $L$, there will be a unique isomorphism $L \cong \widehat{\lim}D$ which preserves the limit structure.
+\end{remk}
+
+\subsection{Proof of The Yoneda Lemma} \label{sec:yonedaproof}
+
+\begin{proof}
+    Let $\s C$ be a locally small category, let $F$ be a presheaf on $\s C$, and $X$ an object of $\s C$.
+    We will define a family of maps $\alpha_X : \psh(\s C)(h_X, F) \to F(X)$, and then show that they make up a natural isomorphism.
+    
+    First, observe that $\psh(\s C)(h_X, F) = h_F(h_X)$ as functors in $X$. For any morphism of presheaves $\beta : h_X \to F$, let $\alpha_X(\beta) = \beta_X(\Id_X)$. 
+    To show that $\alpha_X$ is natural in $X$,
+    we want to show that for any $g : X \to Y$, the following diagram commutes,
+    \[
+    \begin{CD}
+        h_F(h_Y) @>h_F(h_g)>> h_F(h_X) \\
+        @V\alpha_Y VV @VV\alpha_X V \\
+        F(Y) @>>F(g)> F(X)
+    \end{CD}
+    \]
+    which is to say that for any $\beta \in h_F(h_Y)$ (equivalently, $\beta : h_Y \to F$), we want to show that $F(g)(\alpha_Y(\beta)) = \alpha_X(\beta \circ h_g)$. Now, applying the definition of $\alpha$ gives us:
+    \begin{align*}
+        F(g)(\alpha_Y(\beta)) &= F(g)(\beta_Y(\Id_Y)) \\ \\
+        \alpha_X(\beta \circ h_g) &= (\beta \circ h_g)_X(\Id_X) \\
+        &= \beta_X(g)
+    \end{align*}
+    from which point it suffices to show that $F(g)(\beta_Y(\Id_Y)) = \beta_X(g)$, which immediately follows from the naturality of $\beta$.
+    
+    All that remains is to show that $\alpha_X$ is a bijection for each $X \in \s C$. First we will show that $\alpha_X$ is surjective. Let $x \in F(x)$. We wish to construct a morphism $\eta : h_X \to F$ so that $\alpha_X(\eta) = x$. For $Y \in \s C$, we define $\eta_Y : h_X(Y) \to F(Y)$ as $\eta_Y(g) = F(g)(x)$. We verify:
+    \begin{align*}
+        \alpha_X(\eta) &= \eta_X(\Id_X) \\
+        &= F(\Id_X)(x) \\
+        &= \Id_{F(X)}(x) \\
+        &= x
+    \end{align*}
+    Next, we will check that $\eta$ is a natural transformation. Indeed, if $g : Y \to Z$ is a morphism of $\s C$, then for any $k \in h_X(Z)$, we have
+    \begin{align*}
+        \eta_Y(h_X(g)(k)) &= \eta_Y(k \circ g) \\
+        &= F(k \circ g)(x) \\
+        &= F(g)(F(k)(x)) \\
+        &= F(g)(\eta_Z(k))
+    \end{align*}
+    
+    Finally, we will check that $\alpha_X$ is injective. Suppose that $\beta, \gamma : h_X \to F$ are morphisms of presheaves, such that $\alpha_X(\beta) = \alpha_X(\gamma)$, or in other words:
+    \begin{align*}
+        \beta_X(\Id_X) = \gamma_X(\Id_X)
+    \end{align*}
+    We want to show, for an arbitrary $g : Y \to X$, that $\beta_Y(g) = \gamma_Y(g)$. We have the following commutative diagrams due to the naturality of $\beta$ and $\gamma$,
+    \[
+    \begin{CD}
+        h_XX @>h_X(g)>> h_XY  \\
+        @V\beta_X VV @VV\beta_Y V \\
+        F(X) @>>F(g)> F(Y)
+    \end{CD} \qquad \qquad
+    \begin{CD}
+        h_XX @>h_X(g)>> h_XY \\
+        @V\gamma_X VV @VV\gamma_Y V \\
+        F(X) @>>F(g)> F(Y)
+    \end{CD}
+    \]
+    which allow us to compute
+    \begin{align*}
+        \beta_Y(g) &= \beta_Y(\Id_X \circ g) \\
+        &= \beta_Y(h_X(g)(\Id_X)) \\
+        &= F(g)(\beta_X(\Id_X)) \\
+        &= F(g)(\gamma_X(\Id_X)) \\
+        &= \gamma_Y(h_X(g)(\Id_X) \\
+        &= \gamma_Y(\Id_X \circ g) \\
+        &= \gamma_Y(g)
+    \end{align*}
+    completing the proof that $\alpha_X$ is an isomorphism.
+\end{proof}
+
+\begin{thebibliography}{9}
+    \bibitem{awodey}
+        Steve Awodey,
+        \emph{Basic Category Theory},
+        Oxford Logic Guides,
+        second edition,
+        2010.
+\end{thebibliography}
 
 \end{document}
